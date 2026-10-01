@@ -1,0 +1,54 @@
+{
+  "info": {
+    "_postman_id": "0bd47100-bccb-40ef-814f-9e3bc789f40b",
+    "name": "Usuarios Regres",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "9182005",
+    "_collection_link": "https://go.postman.co/collection/9182005-0bd47100-bccb-40ef-814f-9e3bc789f40b?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "TC01 - Crear usuario",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const respuesta = pm.response.json();\r\n\r\npm.test(\"La API responde 201 (usuario creado)\", function () {\r\n    pm.response.to.have.status(201);\r\n});\r\n\r\npm.test(\"El nombre y el trabajo son los mismos que envié\", function () {\r\n    pm.expect(respuesta.name).to.eql(pm.environment.get(\"user_name\"));\r\n    pm.expect(respuesta.job).to.eql(pm.environment.get(\"user_job\"));\r\n});\r\n\r\npm.test(\"La respuesta trae el id y la fecha de creación\", function () {\r\n    pm.expect(respuesta.id).to.exist;\r\n    pm.expect(respuesta.createdAt).to.exist;\r\n});\r\n\r\n// Guardo el id para usarlo en el siguiente caso de prueba\r\npm.environment.set(\"user_id\", respuesta.id);"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "x-api-key",
+            "value": "{{api_key}}",
+            "description": "Llave de acceso que pide la API de Reqres"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"name\": \"{{user_name}}\",\r\n    \"job\": \"{{user_job}}\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{base_url}}/users",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "users"
+          ]
+        }
+      },
+      "response": []
+    }
+  ]
+}
