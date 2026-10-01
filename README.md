@@ -23,7 +23,8 @@ En este proyecto pruebo que la API de Reqres (https://reqres.in/api/) funcione b
 
 | Caso | ¿Qué hace? | ¿Qué espero? | Resultado |
 |------|------------|--------------|-----------|
-| TC01 - Crear usuario | Envío un usuario nuevo con nombre "Test User" y trabajo "Automation Engineer" | Que responda 201, con los mismos datos que envié, un id y la fecha de creación | ✅ Pasó |
-
+| TC01 - Crear usuario | Envío un usuario nuevo con nombre "Test User" y trabajo "Automation Engineer" | Que responda 201, con los mismos datos que envié, un id y la fecha de creación |  Pasó |
+| TC02 - Consultar usuario creado | Consulto el usuario usando el id que me dio el TC01 | Que responda 200 y que el nombre y el trabajo sean los mismos que envié |  Falló (404) |
 ## Hallazgos
 - La API tiene un límite de peticiones por día. Sin una API key propia responde **429 Too Many Requests**. Por eso se recomienda crear una cuenta gratis.
+- Al consultar el usuario recién creado, la API responde **404 Not Found**. Esto pasa porque Reqres es una API de práctica que no guarda los usuarios: responde como si los creara, pero no quedan almacenados. La misma API lo indica en su respuesta ("read-only demo endpoint"). La prueba está bien construida; el fallo se debe al comportamiento de la API.
