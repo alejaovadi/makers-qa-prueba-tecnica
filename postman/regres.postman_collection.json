@@ -84,6 +84,119 @@
         }
       },
       "response": []
+    },
+    {
+      "name": "TC03 - Consultar un usuario que sí existe",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "// TC03 - Consultar un usuario que sí existe\r\n// Objetivo: comprobar que el GET funciona con un usuario que ya existe en Reqres.\r\n// Esto confirma que el 404 del TC02 no es por la consulta, sino porque la API no guarda los usuarios creados.\r\n\r\n// Validación 1: la API debe encontrar el usuario\r\npm.test(\"La API responde 200 (encontró el usuario)\", function () {\r\n    pm.response.to.have.status(200);\r\n});\r\n\r\n// Validación 2: el usuario debe traer sus datos básicos\r\npm.test(\"El usuario trae id, correo, nombre y apellido\", function () {\r\n    const usuario = pm.response.json().data;\r\n    pm.expect(usuario.id).to.eql(2);\r\n    pm.expect(usuario.email).to.exist;\r\n    pm.expect(usuario.first_name).to.exist;\r\n    pm.expect(usuario.last_name).to.exist;\r\n});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "x-api-key",
+            "value": "{{api_key}}",
+            "description": "Llave de acceso que pide la API de Reqres"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/users/2",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "users",
+            "2"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "TC04 - Consultar un usuario que no existe",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "// TC04 - Consultar un usuario que no existe\r\n// Objetivo: comprobar que la API avisa correctamente cuando el usuario no existe.\r\n\r\n// Validación 1: la API debe responder que no encontró el usuario\r\npm.test(\"La API responde 404 (usuario no encontrado)\", function () {\r\n    pm.response.to.have.status(404);\r\n});\r\n\r\n// Validación 2: la respuesta no debe traer datos\r\npm.test(\"La respuesta viene vacía\", function () {\r\n    pm.expect(pm.response.json()).to.eql({});\r\n});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "x-api-key",
+            "value": "{{api_key}}",
+            "description": "Llave de acceso que pide la API de Reqres"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/users/9999",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "users",
+            "9999"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "TC05 - Crear un usuario sin datos",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "// TC05 - Crear un usuario sin datos\r\n// Objetivo: comprobar que la API no permita crear un usuario sin nombre ni trabajo.\r\n// Una API bien construida debería rechazarlo con un error 400 (petición incorrecta).\r\n\r\npm.test(\"La API rechaza el usuario sin datos (400)\", function () {\r\n    pm.response.to.have.status(400);\r\n});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "x-api-key",
+            "value": "{{api_key}}",
+            "description": "Llave de acceso que pide la API de Reqres"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{base_url}}/users",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "users"
+          ]
+        }
+      },
+      "response": []
     }
   ]
 }
