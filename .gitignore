@@ -1,0 +1,22 @@
+# Maven
+target/
+
+# IDEs
+.idea/
+*.iml
+.vscode/
+.classpath
+.project
+.settings/
+
+# Reportes
+allure-results/
+allure-report/
+
+# Sistema
+.DS_Store
+Thumbs.db
+
+# Secretos
+.env
+*.key
