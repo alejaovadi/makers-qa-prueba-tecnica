@@ -49,6 +49,41 @@
         }
       },
       "response": []
+    },
+    {
+      "name": "TC02 - Consultar usuario creado",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "// TC02 - Consultar usuario creado\r\n// Objetivo: verificar que el usuario creado en el TC01 se pueda consultar\r\n// y que sus datos sean los mismos que se enviaron al crearlo.\r\n\r\n// Validación 1: la API debe encontrar el usuario y responder 200\r\npm.test(\"La API responde 200 (encontró el usuario)\", function () {\r\n    pm.response.to.have.status(200);\r\n});\r\n\r\n// Validación 2: el nombre y el trabajo deben coincidir con los del TC01\r\npm.test(\"El nombre y el trabajo son los mismos que envié al crearlo\", function () {\r\n    // Leo lo que respondió la API\r\n    const respuesta = pm.response.json();\r\n    // Algunas respuestas traen los datos dentro de \"data\", por eso reviso ambos casos\r\n    const usuario = respuesta.data || respuesta;\r\n    // Comparo con los datos guardados en el environment\r\n    pm.expect(usuario.name).to.eql(pm.environment.get(\"user_name\"));\r\n    pm.expect(usuario.job).to.eql(pm.environment.get(\"user_job\"));\r\n});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "x-api-key",
+            "value": "{{api_key}}",
+            "description": "Llave de acceso que pide la API de Reqres"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/users/{{user_id}}",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "users",
+            "{{user_id}}"
+          ]
+        }
+      },
+      "response": []
     }
   ]
 }
