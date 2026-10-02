@@ -1,4 +1,4 @@
-\# Automatización
+# Automatización
 
 
 
