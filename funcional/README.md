@@ -73,3 +73,98 @@ Pruebo situaciones que, por experiencia, suelen generar errores: montos con deci
 - **Smoke:** un recorrido rápido del flujo principal (iniciar sesión, ver saldo y enviar dinero) para saber si la versión está estable para seguir probando.
 - **Regresión:** volver a ejecutar los casos después de corregir un bug, para asegurar que no se dañó nada más.
 - **Usabilidad:** reviso que los mensajes de error sean claros y fáciles de entender.
+
+
+## Escenarios de prueba
+
+Los escenarios están escritos en Gherkin para que cualquier persona del equipo, técnica o no, entienda qué se va a probar.
+Uso como ejemplo a dos usuarios: **Laura**, que envía el dinero, y **Andrés**, que lo recibe.
+
+```gherkin
+# language: es
+Característica: Enviar dinero a otro usuario con su número de celular
+  Como usuaria de MakersPay
+  Quiero enviarle dinero a otra persona usando solo su número de celular
+  Para pagarle o compartir gastos de forma rápida y segura
+
+  Antecedentes:
+    Dado que Laura inició sesión en MakersPay y tiene $3.000.000 disponibles
+    Y Andrés está registrado con el celular 310 987 6543 y tiene $100.000
+
+  Escenario: Laura le envía dinero a Andrés y todo sale bien
+    Cuando Laura le envía $50.000 a Andrés
+    Entonces Laura ve un mensaje confirmando que el envío fue exitoso
+    Y su saldo baja a $2.950.000
+    Y el saldo de Andrés sube a $150.000
+    Y el envío aparece en el historial de los dos
+
+  Esquema del escenario: Laura envía montos justo en los límites permitidos
+    Cuando Laura le envía <monto> a Andrés
+    Entonces el envío se realiza sin problemas
+    Y a Laura se le descuentan <monto> de su saldo
+
+    Ejemplos:
+      | monto      |
+      | $5.000     |
+      | $5.001     |
+      | $1.999.999 |
+      | $2.000.000 |
+
+  Esquema del escenario: Laura intenta enviar un monto fuera de los límites
+    Cuando Laura intenta enviarle <monto> a Andrés
+    Entonces ve un mensaje que le explica que <explicacion>
+    Y su saldo sigue igual
+    Y Andrés no recibe nada
+
+    Ejemplos:
+      | monto      | explicacion                                    |
+      | $4.999     | el monto mínimo para enviar es $5.000          |
+      | $2.000.001 | el monto máximo por envío es $2.000.000        |
+
+  Escenario: Laura intenta enviar más dinero del que tiene
+    Dado que a Laura solo le quedan $40.000 disponibles
+    Cuando intenta enviarle $50.000 a Andrés
+    Entonces ve un mensaje que le explica que no tiene saldo suficiente
+    Y su saldo sigue en $40.000
+    Y Andrés no recibe nada
+
+  Escenario: Laura envía exactamente todo lo que tiene
+    Dado que a Laura solo le quedan $40.000 disponibles
+    Cuando le envía $40.000 a Andrés
+    Entonces el envío se realiza sin problemas
+    Y el saldo de Laura queda en $0
+
+  Escenario: Laura intenta enviarse dinero a sí misma
+    Cuando Laura intenta enviar $20.000 a su propio número de celular
+    Entonces ve un mensaje que le explica que no puede enviarse dinero a sí misma
+    Y su saldo sigue igual
+
+  Escenario: Laura intenta enviar dinero a un número que no está en MakersPay
+    Cuando Laura intenta enviar $20.000 al celular 300 000 0000, que no está registrado
+    Entonces ve un mensaje que le explica que ese número no tiene cuenta en MakersPay
+    Y su saldo sigue igual
+
+  Esquema del escenario: Laura escribe datos que no son válidos
+    Cuando Laura intenta enviar "<monto>" al celular "<celular>"
+    Entonces ve un mensaje claro que le indica qué debe corregir
+    Y no se realiza ningún envío
+
+    Ejemplos:
+      | monto     | celular      | por qué no es válido           |
+      |           | 310 987 6543 | dejó el monto vacío            |
+      | 0         | 310 987 6543 | el monto es cero               |
+      | -10.000   | 310 987 6543 | el monto es negativo           |
+      | diez mil  | 310 987 6543 | escribió el monto en letras    |
+      | 20.000    |              | dejó el celular vacío          |
+      | 20.000    | 310 ABC 6543 | el celular tiene letras        |
+
+  Escenario: Alguien intenta enviar dinero sin haber iniciado sesión
+    Dado que Laura cerró su sesión
+    Cuando intenta entrar directamente a la opción de enviar dinero
+    Entonces la app le pide que inicie sesión primero
+
+  Escenario: Laura da doble clic en "Enviar" sin querer
+    Cuando Laura le envía $50.000 a Andrés y presiona "Enviar" dos veces seguidas
+    Entonces el dinero se envía una sola vez
+    Y en el historial aparece un solo movimiento
+```
