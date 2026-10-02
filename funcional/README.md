@@ -201,4 +201,58 @@ Característica: Enviar dinero a otro usuario con su número de celular
 | CP16 | Revisar el historial después de un envío exitoso | Ejecutar primero el CP01 | En el historial de Laura aparece el envío de $50.000 a Andrés.<br>En el historial de Andrés aparece el dinero recibido de Laura.<br>Ambos con la misma fecha, hora y monto. | Alta | Integración | RN05 |
 | CP17 | Intentar enviar dinero sin sesión iniciada | Laura cierra sesión e intenta entrar a "Enviar dinero" | La app no deja entrar y le pide iniciar sesión. | Alta | Basada en la experiencia | Requerimiento: usuario autenticado |
 | CP18 | Presionar "Enviar" dos veces seguidas | Monto: $50.000<br>Doble clic en "Enviar" | El dinero se envía una sola vez.<br>Saldo de Laura: $2.950.000 (no $2.900.000).<br>Un solo movimiento en el historial. | Alta | Basada en la experiencia | RN05 |
+
+
+## Reporte de bugs
+
+
+**Severidad vs. prioridad:** la **severidad** dice qué tan grave es el impacto del error en el sistema; la **prioridad** dice qué tan rápido hay que corregirlo según el negocio.
+
+### BUG-01: El sistema deja enviar dinero dos veces al dar doble clic en "Enviar"
+
+| Campo | Detalle |
+|-------|---------|
+| Caso relacionado | CP18 |
+| Regla incumplida | RN05 |
+| Severidad | Crítica |
+| Prioridad | Alta |
+| Ambiente | MakersPay v1.0 – ambiente de pruebas – Android 14 |
+| Precondición | Laura con sesión iniciada y saldo de $3.000.000. Andrés registrado con el celular 310 987 6543. |
+| Pasos para reproducir | 1. Entrar a "Enviar dinero".<br>2. Escribir el celular 310 987 6543.<br>3. Escribir el monto $50.000.<br>4. Presionar "Enviar" dos veces seguidas. |
+| Resultado esperado | Se envía una sola vez. Saldo de Laura: $2.950.000. Un solo movimiento en el historial. |
+| Resultado obtenido | Se envía dos veces. Saldo de Laura: $2.900.000. Aparecen dos movimientos de $50.000 en el historial. |
+| Evidencia | Captura del historial con los dos movimientos y video del doble clic. |
+| Estado | Nuevo |
+
+### BUG-02: Se puede enviar un monto menor al mínimo permitido
+
+| Campo | Detalle |
+|-------|---------|
+| Caso relacionado | CP04 |
+| Regla incumplida | RN01 |
+| Severidad | Alta |
+| Prioridad | Alta |
+| Ambiente | MakersPay v1.0 – ambiente de pruebas – Android 14 |
+| Precondición | Laura con sesión iniciada y saldo de $3.000.000. |
+| Pasos para reproducir | 1. Entrar a "Enviar dinero".<br>2. Escribir el celular 310 987 6543.<br>3. Escribir el monto $4.999.<br>4. Presionar "Enviar". |
+| Resultado esperado | Mensaje claro indicando que el monto mínimo es $5.000. Los saldos no cambian. |
+| Resultado obtenido | El envío se realiza. A Laura se le descuentan $4.999 y Andrés los recibe. |
+| Evidencia | Captura de la confirmación del envío y del saldo de ambos usuarios. |
+| Estado | Nuevo |
+
+### BUG-03: El mensaje de error al enviar a un número no registrado no es claro
+
+| Campo | Detalle |
+|-------|---------|
+| Caso relacionado | CP11 |
+| Regla incumplida | RN06 |
+| Severidad | Media |
+| Prioridad | Media |
+| Ambiente | MakersPay v1.0 – ambiente de pruebas – Android 14 |
+| Precondición | Laura con sesión iniciada y saldo de $3.000.000. El celular 300 000 0000 no está registrado. |
+| Pasos para reproducir | 1. Entrar a "Enviar dinero".<br>2. Escribir el celular 300 000 0000.<br>3. Escribir el monto $20.000.<br>4. Presionar "Enviar". |
+| Resultado esperado | Mensaje claro, por ejemplo: "Este número no tiene una cuenta en MakersPay". El saldo no cambia. |
+| Resultado obtenido | Aparece el mensaje "Error 404: user not found", que es técnico y está en inglés. El saldo no cambia. |
+| Evidencia | Captura del mensaje de error. |
+| Estado | Nuevo |
 ```
