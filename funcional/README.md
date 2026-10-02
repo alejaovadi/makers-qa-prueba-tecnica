@@ -167,4 +167,38 @@ Característica: Enviar dinero a otro usuario con su número de celular
     Cuando Laura le envía $50.000 a Andrés y presiona "Enviar" dos veces seguidas
     Entonces el dinero se envía una sola vez
     Y en el historial aparece un solo movimiento
+
+
+## Casos de prueba
+
+**Datos de prueba que uso en todos los casos (salvo que el caso diga otra cosa):**
+- **Laura** (quien envía): sesión iniciada, celular 300 123 4567, saldo $3.000.000.
+- **Andrés** (quien recibe): registrado con el celular 310 987 6543, saldo $100.000.
+
+**Pasos base para enviar dinero:**
+1. Entrar a la opción "Enviar dinero".
+2. Escribir el número de celular del destinatario.
+3. Escribir el monto.
+4. Presionar "Enviar".
+
+| ID | Caso de prueba | Datos | Resultado esperado | Prioridad | Técnica | Regla |
+|----|----------------|-------|--------------------|-----------|---------|-------|
+| CP01 | Enviar dinero con datos válidos | Celular: 310 987 6543<br>Monto: $50.000 | Mensaje de envío exitoso.<br>Saldo de Laura: $2.950.000.<br>Saldo de Andrés: $150.000. | Alta | Partición de equivalencia | RN05 |
+| CP02 | Enviar exactamente el monto mínimo | Monto: $5.000 | El envío se realiza y a Laura se le descuentan $5.000. | Alta | Valores límite | RN01 |
+| CP03 | Enviar un peso más del mínimo | Monto: $5.001 | El envío se realiza sin problemas. | Media | Valores límite | RN01 |
+| CP04 | Enviar un peso menos del mínimo | Monto: $4.999 | Mensaje claro indicando que el mínimo es $5.000.<br>Los saldos no cambian. | Alta | Valores límite | RN01, RN06 |
+| CP05 | Enviar exactamente el monto máximo | Monto: $2.000.000 | El envío se realiza y a Laura se le descuentan $2.000.000. | Alta | Valores límite | RN02 |
+| CP06 | Enviar un peso menos del máximo | Monto: $1.999.999 | El envío se realiza sin problemas. | Media | Valores límite | RN02 |
+| CP07 | Enviar un peso más del máximo | Monto: $2.000.001 | Mensaje claro indicando que el máximo es $2.000.000.<br>Los saldos no cambian. | Alta | Valores límite | RN02, RN06 |
+| CP08 | Enviar más dinero del saldo disponible | Saldo de Laura: $40.000<br>Monto: $50.000 | Mensaje claro de saldo insuficiente.<br>Saldo de Laura sigue en $40.000.<br>Andrés no recibe nada. | Alta | Partición de equivalencia | RN03, RN06 |
+| CP09 | Enviar exactamente todo el saldo | Saldo de Laura: $40.000<br>Monto: $40.000 | El envío se realiza.<br>Saldo de Laura queda en $0. | Media | Valores límite | RN03 |
+| CP10 | Enviarse dinero a sí misma | Celular: 300 123 4567 (el de Laura)<br>Monto: $20.000 | Mensaje claro indicando que no puede enviarse dinero a sí misma.<br>El saldo no cambia. | Alta | Partición de equivalencia | RN04, RN06 |
+| CP11 | Enviar a un número que no está registrado | Celular: 300 000 0000<br>Monto: $20.000 | Mensaje claro indicando que el número no tiene cuenta en MakersPay.<br>El saldo no cambia. | Alta | Partición de equivalencia | RN06 |
+| CP12 | Dejar el monto vacío | Monto: (vacío) | El sistema no permite enviar y pide escribir un monto. | Media | Partición de equivalencia | RN06 |
+| CP13 | Escribir un monto en cero o negativo | Monto: 0 y luego -10.000 | El sistema no permite enviar y muestra un mensaje claro en ambos casos. | Media | Partición de equivalencia | RN06 |
+| CP14 | Escribir el monto con letras | Monto: "diez mil" | El campo no acepta letras o muestra un mensaje claro. | Baja | Basada en la experiencia | RN06 |
+| CP15 | Dejar el celular vacío o escribirlo con letras | Celular: (vacío) y luego "310 ABC 6543" | El sistema no permite enviar y pide un número válido. | Media | Partición de equivalencia | RN06 |
+| CP16 | Revisar el historial después de un envío exitoso | Ejecutar primero el CP01 | En el historial de Laura aparece el envío de $50.000 a Andrés.<br>En el historial de Andrés aparece el dinero recibido de Laura.<br>Ambos con la misma fecha, hora y monto. | Alta | Integración | RN05 |
+| CP17 | Intentar enviar dinero sin sesión iniciada | Laura cierra sesión e intenta entrar a "Enviar dinero" | La app no deja entrar y le pide iniciar sesión. | Alta | Basada en la experiencia | Requerimiento: usuario autenticado |
+| CP18 | Presionar "Enviar" dos veces seguidas | Monto: $50.000<br>Doble clic en "Enviar" | El dinero se envía una sola vez.<br>Saldo de Laura: $2.950.000 (no $2.900.000).<br>Un solo movimiento en el historial. | Alta | Basada en la experiencia | RN05 |
 ```
